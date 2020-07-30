@@ -18,8 +18,8 @@
 #define USER_PORT        100
 
 MODULE_LICENSE("GPL");
-MODULE_AUTHOR("zhangwj");
-MODULE_DESCRIPTION("netlink example");
+MODULE_AUTHOR("gaoxingwang");
+MODULE_DESCRIPTION("MiniTask kernel part");
 
 struct sock *nlsk = NULL;
 extern struct net init_net;
@@ -77,7 +77,7 @@ struct netlink_kernel_cfg cfg = {
 	.input  = netlink_rcv_msg, /* set recv callback */
 };
 
-int test_netlink_init(void)
+int test_kernel_init(void)
 {
 	/* create netlink socket */
 	nlsk = (struct sock *)netlink_kernel_create(&init_net, NETLINK_TEST, &cfg);
@@ -86,19 +86,19 @@ int test_netlink_init(void)
 		printk("netlink_kernel_create error !\n");
 		return -1;
 	}
-	printk("test_netlink_init\n");
+	printk("test_kernel_init\n");
 
 	return 0;
 }
 
-void test_netlink_exit(void)
+void test_kernel_exit(void)
 {
 	if (nlsk){
 		netlink_kernel_release(nlsk); /* release ..*/
 		nlsk = NULL;
 	}
-	printk("test_netlink_exit!\n");
+	printk("test_kernel_exit!\n");
 }
 
-module_init(test_netlink_init);
-module_exit(test_netlink_exit);
+module_init(test_kernel_init);
+module_exit(test_kernel_exit);

@@ -67,7 +67,7 @@ int main(int argc, char **argv)
 		close(skfd);
 		exit(-1);
 	}
-	printf("send kernel:%s\n", umsg);
+	printf("send to   kernel:%s\n", umsg);
 
 	memset(&u_info, 0, sizeof(u_info));
 	len = sizeof(struct sockaddr_nl);
@@ -79,7 +79,7 @@ int main(int argc, char **argv)
 		exit(-1);
 	}
 
-	printf("from kernel:%s\n", u_info.msg);
+	printf("recv from kernel:%s\n", u_info.msg);
 	close(skfd);
 
 	free((void *)nlh);
