@@ -12,6 +12,7 @@
 #include <linux/types.h>
 #include <net/sock.h>
 #include <linux/netlink.h>
+#include "test_kernel.h"
 
 #define NETLINK_TEST     30
 #define MSG_LEN            125
@@ -59,17 +60,25 @@ static void netlink_rcv_msg(struct sk_buff *skb)
 {
 	struct nlmsghdr *nlh = NULL;
 	char *umsg = NULL;
+	conf_t *conf = NULL;
 	char *kmsg = "hello users!!!";
 
 	if(skb->len >= nlmsg_total_size(0))
 	{
 		nlh = nlmsg_hdr(skb);
-		umsg = NLMSG_DATA(nlh);
-		if(umsg)
+		//umsg = NLMSG_DATA(nlh);
+		//if(umsg)
+		//{
+		//	printk("kernel recv from user: %s\n", umsg);
+		//	send_usrmsg(kmsg, strlen(kmsg));
+		//}
+		conf = NLMSG_DATA(nlh);
+		if(conf)
 		{
-			printk("kernel recv from user: %s\n", umsg);
+			printk("kernel recv from user: %s %s %d\n", conf->protocol, conf->ip, conf->port);
 			send_usrmsg(kmsg, strlen(kmsg));
 		}
+
 	}
 }
 
