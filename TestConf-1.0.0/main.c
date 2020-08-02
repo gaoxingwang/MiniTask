@@ -1,11 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/socket.h>
-#include <string.h>
-#include <linux/netlink.h>
-#include <stdint.h>
-#include <unistd.h>
-#include <errno.h>
 #include "parse.h"
 
 #define NETLINK_TEST    30
@@ -20,12 +12,12 @@ typedef struct _user_msg_info
 
 int main(int argc, char **argv)
 {
-	int skfd;
+	//int skfd;
 	int ret;
 	user_msg_info u_info;
 	socklen_t len;
-	struct nlmsghdr *nlh = NULL;
-	struct sockaddr_nl saddr, daddr;
+	//struct nlmsghdr *nlh = NULL;
+	//struct sockaddr_nl saddr, daddr;
 	//char *umsg = "hello netlink!!";
 	conf_t conf;
 
@@ -61,10 +53,8 @@ int main(int argc, char **argv)
 
 	memset(&conf, 0, sizeof(conf));
 	parseFile(&conf);
-	printf("conf.protocol : %s\n",conf.protocol);
-	printf("conf.ip       : %s\n",conf.ip);
-	printf("conf.port     : %d\n",conf.port);
 	//memcpy(NLMSG_DATA(nlh), umsg, strlen(umsg));
+#if 0
 	memcpy(NLMSG_DATA(nlh), &conf, sizeof(conf));
 	ret = sendto(skfd, nlh, nlh->nlmsg_len, 0, (struct sockaddr *)&daddr, sizeof(struct sockaddr_nl));
 	if (!ret) {
@@ -73,7 +63,7 @@ int main(int argc, char **argv)
 		exit(-1);
 	}
 	//printf("send to   kernel:%s\n", umsg);
-
+#endif
 	memset(&u_info, 0, sizeof(u_info));
 	len = sizeof(struct sockaddr_nl);
 	ret = recvfrom(skfd, &u_info, sizeof(user_msg_info), 0, (struct sockaddr *)&daddr, &len);

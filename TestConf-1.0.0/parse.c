@@ -4,6 +4,10 @@
 #include <ctype.h>
 #include "parse.h"
 
+//extern int skfd;
+//extern struct nlmsghdr *nlh;
+//extern struct sockaddr_nl saddr, daddr;
+
 char *trim_left_right(char *s)
 {
 	char *e;
@@ -26,7 +30,7 @@ char *trim_left_right(char *s)
 	return s;
 }
 
-int parseFile(conf_t *cf)
+int parseFile(conf_t *conf)
 {
 	FILE *fp = NULL;
 	char *protocol, *ip, *port;
@@ -80,11 +84,21 @@ int parseFile(conf_t *cf)
 		if (strcmp(protocol, "Protocol") == 0) {
 			continue;
 		}
-		strcpy(cf->protocol, protocol);
-		strcpy(cf->ip, ip);
-		cf->port = atoi(port);
+		strcpy(conf->protocol, protocol);
+		strcpy(conf->ip, ip);
+		conf->port = atoi(port);
 
+		printf("send to Kernel: %s %s %d\n",conf->protocol, conf->ip, conf->port);
+
+		memcpy(NLMSG_DATA(nlh), conf, sizeof(conf_t));
+		int ret = sendto(skfd, nlh, nlh->nlmsg_len, 0, (struct sockaddr *)&daddr, sizeof(struct sockaddr_nl));
+		if (!ret) {
+			perror("sendto error\n");
+			close(skfd);
+			exit(-1);
+		}
 		memset(buf, 0, MAX_BUF_LEN);
+		memset(conf, 0, sizeof(conf_t));
 	}
 
 	return 1;
