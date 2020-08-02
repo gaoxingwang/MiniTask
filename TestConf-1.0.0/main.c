@@ -26,7 +26,7 @@ int main(int argc, char **argv)
 	socklen_t len;
 	struct nlmsghdr *nlh = NULL;
 	struct sockaddr_nl saddr, daddr;
-	char *umsg = "hello netlink!!";
+	//char *umsg = "hello netlink!!";
 	conf_t conf;
 
 	/* 创建NETLINK socket */

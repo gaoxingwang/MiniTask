@@ -7,11 +7,14 @@
 char *trim_left_right(char *s)
 {
 	char *e;
+	/* 去除开头的空白 */
+	while (isspace(*s)) {
+		s++;
+	}
+
 	if (strlen(s) == 0) {
 		return s;
 	}
-	/* 去除开头的空白 */
-	while (isspace(*s)) s++;
 
 	/* 结尾空白全部置为\0 */
 	e = s + strlen(s) - 1;
@@ -22,16 +25,6 @@ char *trim_left_right(char *s)
 
 	return s;
 }
-
-int isdelimiter(char c)
-{
-	if (isspace(c) || c == '=' || c == ':' ) {
-		return 1;
-	} else {
-		return 0;
-	}
-}
-
 
 int parseFile(conf_t *cf)
 {
@@ -45,35 +38,34 @@ int parseFile(conf_t *cf)
 		printf("open %s fail!\n", MINITASK_CONF);
 		return -1;
 	}
-
+	memset(buf, 0, MAX_BUF_LEN);
 
 	while (fgets(buf, MAX_BUF_LEN, fp) != NULL) {
 		/* 去除前后的空白符 */
 		para = trim_left_right(buf);
 
 		if (*para == '\0') {
-			memset(buf, 0, MAX_BUF_LEN);
 			continue;
 		}
 
 		protocol = para;
 		ip = para;
-		
-		while (!isdelimiter(*ip) && *ip!= '\0') {
+
+		while (!isspace(*ip) && *ip!= '\0') {
 			ip++;
 		}
 
-		while (isdelimiter(*ip) && *ip != '\0') {
+		while (isspace(*ip) && *ip != '\0') {
 			/*protocol str end*/
 			*ip = '\0';
 			ip++;
 		}
 
 		port = ip;
-		while (!isdelimiter(*port) && *port != '\0') {
+		while (!isspace(*port) && *port != '\0') {
 			port++;
 		}
-		while (isdelimiter(*port) && *port != '\0') {
+		while (isspace(*port) && *port != '\0') {
 			/*ip str end*/
 			*port = '\0';
 			port++;
@@ -84,7 +76,7 @@ int parseFile(conf_t *cf)
 			memset(buf, 0, MAX_BUF_LEN);
 			continue;
 		}
-		
+
 		if (strcmp(protocol, "Protocol") == 0) {
 			continue;
 		}
