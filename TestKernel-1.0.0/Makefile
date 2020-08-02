@@ -1,4 +1,4 @@
-obj-m := TestKernel.o
+obj-m := test_kernel.o
 
 KDIR ?= /lib/modules/`uname -r`/build
 all:

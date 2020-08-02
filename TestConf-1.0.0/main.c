@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include <unistd.h>
 #include <errno.h>
+#include "parse.h"
 
 #define NETLINK_TEST    30
 #define MSG_LEN            125
@@ -26,11 +27,11 @@ int main(int argc, char **argv)
 	struct nlmsghdr *nlh = NULL;
 	struct sockaddr_nl saddr, daddr;
 	char *umsg = "hello netlink!!";
+	conf_t conf;
 
 	/* 创建NETLINK socket */
 	skfd = socket(AF_NETLINK, SOCK_RAW, NETLINK_TEST);
-	if(skfd == -1)
-	{
+	if (skfd == -1) {
 		perror("create socket error\n");
 		return -1;
 	}
@@ -39,8 +40,7 @@ int main(int argc, char **argv)
 	saddr.nl_family = AF_NETLINK; //AF_NETLINK
 	saddr.nl_pid = 100;  //端口号(port ID)
 	saddr.nl_groups = 0;
-	if(bind(skfd, (struct sockaddr *)&saddr, sizeof(saddr)) != 0)
-	{
+	if (bind(skfd, (struct sockaddr *)&saddr, sizeof(saddr)) != 0) {
 		perror("bind() error\n");
 		close(skfd);
 		return -1;
@@ -59,21 +59,25 @@ int main(int argc, char **argv)
 	nlh->nlmsg_seq = 0;
 	nlh->nlmsg_pid = saddr.nl_pid; //self port
 
-	memcpy(NLMSG_DATA(nlh), umsg, strlen(umsg));
+	memset(&conf, 0, sizeof(conf));
+	parseFile(&conf);
+	printf("conf.protocol : %s\n",conf.protocol);
+	printf("conf.ip       : %s\n",conf.ip);
+	printf("conf.port     : %d\n",conf.port);
+	//memcpy(NLMSG_DATA(nlh), umsg, strlen(umsg));
+	memcpy(NLMSG_DATA(nlh), &conf, sizeof(conf));
 	ret = sendto(skfd, nlh, nlh->nlmsg_len, 0, (struct sockaddr *)&daddr, sizeof(struct sockaddr_nl));
-	if(!ret)
-	{
+	if (!ret) {
 		perror("sendto error\n");
 		close(skfd);
 		exit(-1);
 	}
-	printf("send to   kernel:%s\n", umsg);
+	//printf("send to   kernel:%s\n", umsg);
 
 	memset(&u_info, 0, sizeof(u_info));
 	len = sizeof(struct sockaddr_nl);
 	ret = recvfrom(skfd, &u_info, sizeof(user_msg_info), 0, (struct sockaddr *)&daddr, &len);
-	if(!ret)
-	{
+	if (!ret) {
 		perror("recv form kernel error\n");
 		close(skfd);
 		exit(-1);
